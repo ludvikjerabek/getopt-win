@@ -183,5 +183,5 @@ Additionally precompiled header file must be added as the first include of the g
 10/15/2012 - Modified to match latest GNU features  
 06/19/2015 - Fixed maximum option limitation caused by option_a (255) and option_w (65535) structure val variable  
 
-#License
+# License
 Licensed under The GNU Lesser General Public License (LGPLv3)
