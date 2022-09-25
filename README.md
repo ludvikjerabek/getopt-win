@@ -52,6 +52,7 @@ The following code segment located in getopt.h is responsible for mapping the co
 
 To help with understanding how to use the code, many versions have been provided for download. The following downloads are provided:
 
+* Visual Studio .NET 2022 ANSI Project (New Source)
 * Visual Studio .NET 2010 ANSI Project (v1.0)
 * Visual Studio .NET 2008 ANSI Project (v1.0)
 * Visual Studio .NET 2008 MFC Project (v1.0)
@@ -182,6 +183,8 @@ Additionally precompiled header file must be added as the first include of the g
 08/03/2012 - Created separate functions for char and wchar_t characters so single DLL can do both Unicode and ANSI  
 10/15/2012 - Modified to match latest GNU features  
 06/19/2015 - Fixed maximum option limitation caused by option_a (255) and option_w (65535) structure val variable  
+09/24/2022 - Updated to match most recent getopt release  
+09/25/2022 - Fixed memory allocation (malloc call) issue for wchar_t*  
 
 # License
 Licensed under The GNU Lesser General Public License (LGPLv3)
