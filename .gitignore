@@ -1,0 +1,17 @@
+# common build directories
+build*/
+
+# CMake local configuration files
+CMakeUserPresets.json
+
+# CMake build system auto-generated files and directories
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
