@@ -225,5 +225,5 @@ target_link_libraries(myprogram PRIVATE getopt::getopt_static)
 09/24/2022 - Updated to match most recent getopt release  
 09/25/2022 - Fixed memory allocation (malloc call) issue for wchar_t*  
 
-#License
+# License
 Licensed under The GNU Lesser General Public License (LGPLv3)
