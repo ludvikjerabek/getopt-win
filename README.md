@@ -184,16 +184,6 @@ ctest -C Release
 cmake --install . --prefix C:\getopt-install
 ```
 
-### MinGW
-
-```bash
-mkdir build && cd build
-cmake .. -G "MinGW Makefiles" -DBUILD_SHARED_LIB=ON -DBUILD_STATIC_LIB=ON -DBUILD_TESTING=ON
-mingw32-make
-ctest
-mingw32-make install DESTDIR=C:/getopt-install
-```
-
 # Linking to your own project
 
 ### Using in your CMake Project (Shared Object)
