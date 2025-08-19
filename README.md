@@ -172,6 +172,45 @@ Additionally precompiled header file must be added as the first include of the g
 #include "getopt.h"
 ```
 
+# CMake Build on Windows
+
+### Visual Studio (MSVC)
+
+```cmd
+mkdir build && cd build
+cmake .. -G "Visual Studio 17 2022" -A x64 -DBUILD_SHARED_LIB=ON -DBUILD_STATIC_LIB=ON -DBUILD_TESTING=ON
+cmake --build . --config Release
+ctest -C Release
+cmake --install . --prefix C:\getopt-install
+```
+
+### MinGW
+
+```bash
+mkdir build && cd build
+cmake .. -G "MinGW Makefiles" -DBUILD_SHARED_LIB=ON -DBUILD_STATIC_LIB=ON -DBUILD_TESTING=ON
+mingw32-make
+ctest
+mingw32-make install DESTDIR=C:/getopt-install
+```
+
+# Linking to your own project
+
+### Using in your CMake Project (Shared Object)
+
+```
+find_package(getopt REQUIRED)
+add_executable(myprogram main.c)
+target_link_libraries(myprogram PRIVATE getopt::getopt_shared)
+```
+
+### Using in your CMake Project (Static Linking)
+```
+find_package(getopt REQUIRED)
+target_compile_definitions(myprogram PRIVATE STATIC_GETOPT)
+target_link_libraries(myprogram PRIVATE getopt::getopt_static)
+```
+
 # History
 
 02/03/2011 - Initial release  
