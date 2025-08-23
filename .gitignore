@@ -403,6 +403,8 @@ FodyWeavers.xsd
 # common build directories
 build*/
 
+.idea
+
 # CMake local configuration files
 CMakeUserPresets.json
 
