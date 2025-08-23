@@ -1,0 +1,8 @@
+{
+  "name": "getopt-win",
+  "version-string": "1.0.0",
+  "description": "Windows-compatible getopt implementation supporting Unicode and ANSI.",
+  "homepage": "https://github.com/ludvikjerabek/getopt-win",
+  "license": "LGPL-3.0",
+  "dependencies": []
+}
