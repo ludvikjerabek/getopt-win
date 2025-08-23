@@ -45,10 +45,9 @@ jobs:
           install: mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake mingw-w64-x86_64-make
 
       - name: Set up vcpkg
-        uses: lukka/get-cmake@v1
+        uses: lukka/get-cmake@latest
         with:
           cmakeVersion: '3.25'
-          vcpkgVersion: '2023.10.19'
 
       - name: Cache vcpkg dependencies
         uses: actions/cache@v4
