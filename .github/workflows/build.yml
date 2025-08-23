@@ -1,0 +1,167 @@
+name: Build getopt-win
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        compiler: [ msvc, mingw ]
+        build_type: [ Release ]
+        include:
+          - compiler: msvc
+            triplet: x64-windows
+            generator: "Visual Studio 17 2022"
+            cmake_args: "-A x64"
+            build_cmd: "cmake --build build --config Release"
+            test_cmd: "ctest -C Release --output-on-failure"
+          - compiler: mingw
+            triplet: x64-windows-static
+            generator: "MinGW Makefiles"
+            cmake_args: ""
+            build_cmd: "mingw32-make"
+            test_cmd: "ctest --output-on-failure"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up CMake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.25'
+
+      - name: Set up MinGW (for mingw build)
+        if: matrix.compiler == 'mingw'
+        uses: msys2/setup-msys2@v2
+        with:
+          msys2-path: mingw64
+          install: mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake mingw-w64-x86_64-make
+
+      - name: Set up vcpkg
+        uses: lukka/get-cmake@v1
+        with:
+          cmakeVersion: '3.25'
+          vcpkgVersion: '2023.10.19'
+
+      - name: Cache vcpkg dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/vcpkg/installed/
+          key: vcpkg-${{ matrix.triplet }}-${{ hashFiles('vcpkg.json') }}
+
+      - name: Configure CMake
+        run: |
+          cmake -S . -B build \
+            -G "${{ matrix.generator }}" \
+            ${{ matrix.cmake_args }} \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+            -DBUILD_SHARED_LIB=ON \
+            -DBUILD_STATIC_LIB=ON \
+            -DBUILD_TESTING=ON \
+            -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
+        shell: bash
+
+      - name: Build
+        run: ${{ matrix.build_cmd }}
+        shell: bash
+
+      - name: Run Tests
+        working-directory: build
+        run: ${{ matrix.test_cmd }}
+        shell: bash
+
+      - name: Install
+        run: cmake --install build --prefix install
+        shell: bash
+
+      - name: Create Tarball and Update vcpkg Port
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          # Create tarball
+          VERSION=${{ github.ref_name }}
+          VERSION=${VERSION#v}  # Remove 'v' prefix (e.g., v1.1.0 -> 1.1.0)
+          git archive --format=tar.gz --prefix=getopt-win-${VERSION}/ ${VERSION} > getopt-win-${VERSION}.tar.gz
+          SHA512=$(sha512sum getopt-win-${VERSION}.tar.gz | cut -d ' ' -f 1)
+          echo "SHA512: $SHA512" > getopt-win-${VERSION}.tar.gz.sha512
+
+          # Update vcpkg port files
+          sed "s/@VERSION@/$VERSION/g" vcpkg-port/vcpkg.json.in > vcpkg-port/vcpkg.json
+          sed -e "s/@VERSION@/$VERSION/g" -e "s/@SHA512@/$SHA512/g" vcpkg-port/portfile.cmake.in > vcpkg-port/portfile.cmake
+        shell: bash
+
+      - name: Upload Tarball and vcpkg Port
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/upload-artifact@v4
+        with:
+          name: getopt-win-release
+          path: |
+            getopt-win-${{ github.ref_name }}.tar.gz
+            getopt-win-${{ github.ref_name }}.tar.gz.sha512
+            vcpkg-port/vcpkg.json
+            vcpkg-port/portfile.cmake
+            vcpkg-port/usage
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            getopt-win-${{ github.ref_name }}.tar.gz
+            getopt-win-${{ github.ref_name }}.tar.gz.sha512
+            vcpkg-port/vcpkg.json
+            vcpkg-port/portfile.cmake
+            vcpkg-port/usage
+          body: |
+            getopt-win ${{ github.ref_name }}
+            - Static and shared libraries for Windows
+            - ANSI and Unicode support
+            - CMake and vcpkg integration
+            - vcpkg port files included
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Test vcpkg Integration
+        run: |
+          mkdir test-vcpkg
+          cd test-vcpkg
+          echo '{
+            "name": "test-vcpkg",
+            "version": "1.0.0",
+            "dependencies": [
+              {"name": "getopt-win", "version>=": "${{ github.ref_name }}"}
+            ]
+          }' > vcpkg.json
+          echo '#include <stdio.h>
+          #include "getopt.h"
+          int main(int argc, char *argv[]) {
+              int opt;
+              struct option long_options[] = {{"add", 0, 0, '\''a'\''}, {0, 0, 0, 0}};
+              while ((opt = getopt_long(argc, argv, "abc:", long_options, NULL)) != -1) {
+                  printf("Option %c\n", opt);
+              }
+              return 0;
+          }' > main.c
+          echo 'cmake_minimum_required(VERSION 3.12)
+          project(test LANGUAGES C)
+          set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
+          find_package(getopt REQUIRED)
+          add_executable(test_static main.c)
+          target_compile_definitions(test_static PRIVATE STATIC_GETOPT)
+          target_link_libraries(test_static PRIVATE getopt::getopt_static)
+          add_executable(test_shared main.c)
+          target_link_libraries(test_shared PRIVATE getopt::getopt_shared)' > CMakeLists.txt
+          cmake -S . -B build -G "${{ matrix.generator }}" ${{ matrix.cmake_args }} -DCMAKE_BUILD_TYPE=Release
+          ${{ matrix.build_cmd }}
+          cp ${{ github.workspace }}/vcpkg/installed/${{ matrix.triplet }}/bin/libgetopt.dll build/ || true
+          ./build/test_static.exe -a -b -c hello
+          ./build/test_shared.exe -a -b -c hello
+        shell: bash
+        env:
+          VCPKG_ROOT: ${{ github.workspace }}/vcpkg
