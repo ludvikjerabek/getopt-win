@@ -1,5 +1,25 @@
 @PACKAGE_INIT@
 
-include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
+# Include the targets file to define getopt::getopt_shared and getopt::getopt_static
+include("${CMAKE_CURRENT_LIST_DIR}/getoptTargets.cmake")
 
-check_required_components(@PROJECT_NAME@)
+# Initialize list of available components based on installed targets
+set(_getopt_available_components "")
+if(TARGET getopt::getopt_shared)
+    list(APPEND _getopt_available_components shared)
+endif()
+if(TARGET getopt::getopt_static)
+    list(APPEND _getopt_available_components static)
+endif()
+
+# Check requested components
+foreach(comp IN LISTS getopt_FIND_COMPONENTS)
+    if(NOT comp IN_LIST _getopt_available_components)
+        set(getopt_FOUND FALSE)
+        set(getopt_NOT_FOUND_MESSAGE "Component '${comp}' is not available in getopt. Valid components are: ${_getopt_available_components}")
+        return()
+    endif()
+endforeach()
+
+# Ensure all required components are found
+check_required_components(getopt)
