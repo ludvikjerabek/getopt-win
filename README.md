@@ -214,9 +214,9 @@ add_executable(myprogram main.c)
 10/15/2012 - Modified to match latest GNU features  
 06/19/2015 - Fixed maximum option limitation caused by option_a (255) and option_w (65535) structure val variable  
 09/24/2022 - Updated to match most recent getopt release  
-09/25/2022 - Fixed memory allocation (malloc call) issue for wchar_t*
-08/24/2025 - Updated to match glibc 2.42 getopt
-08/24/2025 - Added reentrant function declarations, updated argv types to char ** and wchar_t **, added cross-compilation support
+09/25/2022 - Fixed memory allocation (malloc call) issue for wchar_t*  
+08/24/2025 - Updated to match glibc 2.42 getopt  
+08/24/2025 - Added reentrant function declarations, updated argv types to char ** and wchar_t **, added cross-compilation support  
 
 # License
 Licensed under The GNU Lesser General Public License (LGPLv3)
