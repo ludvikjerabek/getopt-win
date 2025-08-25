@@ -130,21 +130,49 @@ int _tmain(int argc, TCHAR** argv)
 }
 ```
 
-# Using this Code with C++ Precompiled Headers
-When using this code statically within a C++ project with precompiled headers, it is necessary to rename getopt.c to getopt.cpp in order to circumvent the following compiler error:
+# ⚠️ Precompiled Header Compatibility Note (MSVC)
+
+When statically linking this library into a **C++ project that uses precompiled headers (PCH)**, you may encounter the following MSVC compiler error:
+
 ```
-"C1853 - Precompiled header file is from a previous version of the compiler,
-or the precompiled header is C++ and you are using it from C (or vice versa)."
+C1853: Precompiled header file is from a previous version of the compiler,
+or the precompiled header is C++ and you are using it from C (or vice versa).
 ```
-Additionally precompiled header file must be added as the first include of the getopt.c or getopt.cpp file. For example, if you are using "stdafx.h" as the precompiled header, the following would be expected:
-```C
-// File comments removed
+
+This occurs because MSVC treats `.c` and `.cpp` files differently when applying precompiled headers. If your project’s PCH was generated in C++ mode (e.g., from `stdafx.cpp`), and you attempt to compile `getopt.c` as a C file, the compiler will reject the PCH due to language mismatch.
+
+---
+
+# ✅ Workarounds
+
+To resolve this issue, you have two options:
+
+#### 1. **Rename `getopt.c` to `getopt.cpp`
+
+This forces MSVC to compile the file in C++ mode, allowing it to use the C++-generated PCH. If you choose this approach, ensure that your precompiled header (e.g., `stdafx.h`) is included as the **first line** in the source file:
+
+```cpp
 #include "stdafx.h"
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdlib.h>
 #include <stdio.h>
 #include "getopt.h"
 ```
+
+#### 2. **Disable PCH for `getopt.c`**
+
+If you prefer to keep the file as C, you can disable precompiled headers for this file:
+
+* In Visual Studio:\
+  Right-click `getopt.c` → **Properties** → **C/C++ → Precompiled Headers** → set to **Not Using Precompiled Headers**
+
+* In CMake:
+
+  ```cmake
+  set_source_files_properties(src/getopt.c PROPERTIES COMPILE_FLAGS "/Y-")
+  ```
+
+This avoids the mismatch entirely and compiles the file independently of the PCH system.
 
 # CMake Build on Windows
 ### Visual Studio (MSVC)
