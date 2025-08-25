@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 3.12)
-
 project(getopt VERSION 2.42.0
         DESCRIPTION "Getopt library for parsing command-line arguments, supporting ANSI and Unicode"
         HOMEPAGE_URL "https://github.com/ludvikjerabek/getopt-win"
@@ -12,6 +11,9 @@ include(CMakePackageConfigHelpers)
 option(BUILD_SHARED_LIBS "Build shared library (produces getopt.dll and getopt.lib)" ON)
 option(BUILD_STATIC_LIBS "Build static library (produces getopt_static.lib)" ON)
 option(BUILD_TESTING "Enable tests for both shared and static libraries" ON)
+
+# Debug architecture
+# message("getopt-win CMAKE_SIZEOF_VOID_P: ${CMAKE_SIZEOF_VOID_P}")
 
 set(GETOPT_SRC src/getopt.c)
 set(GETOPT_HDR src/getopt.h)
@@ -33,7 +35,6 @@ if(BUILD_SHARED_LIBS)
     if(WIN32)
         set_target_properties(getopt_shared PROPERTIES
                 WINDOWS_EXPORT_ALL_SYMBOLS TRUE
-                # Ensure DLL is named getopt.dll and import library is getopt.lib
                 RUNTIME_OUTPUT_NAME getopt
                 ARCHIVE_OUTPUT_NAME getopt
         )
