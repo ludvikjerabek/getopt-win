@@ -44,16 +44,16 @@ The following code segment located in getopt.h is responsible for mapping the co
 #endif
 ```
 
-# Sample Code Provided
+# Sample Visual Studio Projects Provided
 To help with understanding how to use the code, many versions have been provided for download. The following downloads are provided:
-* Visual Studio .NET 2022 ANSI Project (New Source)
-* Visual Studio .NET 2010 ANSI Project (v1.0)
-* Visual Studio .NET 2008 ANSI Project (v1.0)
-* Visual Studio .NET 2008 MFC Project (v1.0)
-* Visual Studio .NET 2005 ANSI Project (v1.0)
-* Visual Studio .NET 2005 MFC Project (v1.0)
-* Visual Studio 6 ANSI Project (v1.0)
-* Visual Studio 6 MFC Project (v1.0)
+* Visual Studio .NET 2022 ANSI Project
+* Visual Studio .NET 2010 ANSI Project
+* Visual Studio .NET 2008 ANSI Project
+* Visual Studio .NET 2008 MFC Project
+* Visual Studio .NET 2005 ANSI Project
+* Visual Studio .NET 2005 MFC Project
+* Visual Studio 6 ANSI Project
+* Visual Studio 6 MFC Project
 
 # Using the Code
 The code is used identical to GNU getopt.
