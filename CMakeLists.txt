@@ -45,7 +45,7 @@ endif()
 # Static library (produces getopt_static.lib on Windows)
 if(BUILD_STATIC_LIBS)
     add_library(getopt_static STATIC ${GETOPT_SRC})
-    target_compile_definitions(getopt_static PRIVATE STATIC_GETOPT)
+    target_compile_definitions(getopt_static PUBLIC STATIC_GETOPT)
     target_include_directories(getopt_static PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
             $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
@@ -79,7 +79,6 @@ if(BUILD_TESTING AND (BUILD_SHARED_LIBS OR BUILD_STATIC_LIBS))
         add_executable(getopt_test_static tests/main.c)
         target_include_directories(getopt_test_static PRIVATE src)
         target_link_libraries(getopt_test_static PRIVATE getopt_static)
-        target_compile_definitions(getopt_test_static PRIVATE STATIC_GETOPT)
         add_test(NAME test_static
                 COMMAND getopt_test_static --add -b -c hello -d 42 --verbose nonopt1 nonopt2
         )
