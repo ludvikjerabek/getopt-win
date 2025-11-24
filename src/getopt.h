@@ -61,12 +61,12 @@
 
 // Change behavior for C\C++
 #ifdef __cplusplus
-#define _BEGIN_EXTERN_C extern "C" {
-#define _END_EXTERN_C }
+#define GETOPT_BEGIN_EXTERN_C extern "C" {
+#define GETOPT_END_EXTERN_C }
 #define _GETOPT_THROW throw()
 #else
-#define _BEGIN_EXTERN_C
-#define _END_EXTERN_C
+#define GETOPT_BEGIN_EXTERN_C
+#define GETOPT_END_EXTERN_C
 #define _GETOPT_THROW
 #endif
 
@@ -85,7 +85,7 @@
 #include <string.h>
 #include <wchar.h>
 
-_BEGIN_EXTERN_C
+GETOPT_BEGIN_EXTERN_C
 
 // Forward declarations for reentrant structures
 struct _getopt_data_a;
@@ -141,10 +141,10 @@ extern _GETOPT_API int _getopt_long_r_w(int argc, wchar_t* const * argv, const w
 extern _GETOPT_API int _getopt_long_only_r_w(int argc, wchar_t* const * argv, const wchar_t* options,
                                              const struct option_w* long_options, int* opt_index,
                                              struct _getopt_data_w* d) _GETOPT_THROW;
-_END_EXTERN_C
+GETOPT_END_EXTERN_C
 
-#undef _BEGIN_EXTERN_C
-#undef _END_EXTERN_C
+#undef GETOPT_BEGIN_EXTERN_C
+#undef GETOPT_END_EXTERN_C
 #undef _GETOPT_THROW
 #undef _GETOPT_API
 
